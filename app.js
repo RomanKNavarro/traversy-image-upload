@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 
 // What is this for again?
-const GridFsStorage = require('multer-gridfs-storage');
+const {GridFsStorage} = require('multer-gridfs-storage');
 // const Grid = require('gridfs-stream');     // DEPRECATED. WHAT DO WE USE INSTEAD?
 const methodOverride = require('method-override')
 
@@ -19,6 +19,7 @@ app.use(bodyParser.json())
 app.use(methodOverride('_method')); 
 /* this tells our app that we want to use a query string 
 when we create our form in order to make a delete request */
+
 app.set('view engine', 'ejs')   
 // using ejs as our view engine. We can totally use react too, but ejs is quick. 
 // Plus this isn't a frontend tutorial 
@@ -26,6 +27,10 @@ app.set('view engine', 'ejs')
 // MONGO URI (made sure to select "connect from application")
 const mongoURI = "mongodb+srv://ronnoverro:streets123@imagecluster.uwvcxj6.mongodb.net/?retryWrites=true&w=majority"
 const conn = mongoose.createConnection(mongoURI); // mongo connection
+// I AM SUPPOSED TO CONNECT TO THE DATABASE, NOT THE CLUSTER
+
+// init gfs (initialize grid fs variable). 
+
 
 // THIS IS DEPRECATED. 
 // init gfs (initialize grid fs variable). 
@@ -36,8 +41,16 @@ const conn = mongoose.createConnection(mongoURI); // mongo connection
 //   gfs.collection('uploads');
 // });
 // what does deprecated code do? we specify what we want to use as our collection name, "uploads", when our db is open.
+// NEED TO REPLACE ALL INSTANCES OF "gridfs-stream" with mongoose's GridFSBucket
 
-let gfs = new mongoose.mongo.GridFSBucket(conn.db, {bucketName: 'uploads'});    // FROM SUPPORT COMMENT
+// This is to set the collection name. ERROR HERE:
+let gfs;
+conn.once('open', () => {
+  gfs = new mongoose.mongo.GridFSBucket(conn.db, {bucketName: 'files'});
+})
+// let gfs = new mongoose.mongo.GridFSBucket(conn.db, {bucketName: 'files'});    // FROM SUPPORT COMMENT
+
+
 
 // CREATE STORAGE ENGINE (OR OBJECT. Pasted from multer-grid-fs github docs). 
 // Here is where we use "crypto" for file encryption:
@@ -68,13 +81,13 @@ const upload = multer({ storage });
 // @route GET /
 // @desc Loads form 
 app.get('/', (req, res) => {
-  res.render('index');
+  res.render('index');          // THIS IS NEEDED TO RENDER OUR PAGE YOU IDIOT.
 });   
 
 // @route POST /upload
 // @desc Uploads file to DB
 app.post('/upload', upload.single('file'), (req, res) => {
-  // res.json({ file: req.file });
+  res.json({ file: req.file });
 })
 // SECOND ARG (optional), upload.single('file'), is our middleware. We use "single" b/c we are uploading a 
 // single file. We pass to single() the name we used for the "file" field needs to be the same as our html 
