@@ -58,6 +58,7 @@ const storage = new GridFsStorage({
   url: mongoURI,
   file: (req, file) => {
     return new Promise((resolve, reject) => {
+      // this func encrypts our filename
       crypto.randomBytes(16, (err, buf) => {
         if (err) {
           return reject(err);
@@ -88,6 +89,7 @@ app.get('/', (req, res) => {
 // @desc Uploads file to DB
 app.post('/upload', upload.single('file'), (req, res) => {
   res.json({ file: req.file });
+  //res.redirect('/') // Take us back to the homepage after uploading an image. 
 })
 // SECOND ARG (optional), upload.single('file'), is our middleware. We use "single" b/c we are uploading a 
 // single file. We pass to single() the name we used for the "file" field needs to be the same as our html 
