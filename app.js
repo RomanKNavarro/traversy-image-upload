@@ -37,7 +37,6 @@ conn.once('open', () => {
 // let gfs = new mongoose.mongo.GridFSBucket(conn.db, {bucketName: 'files'});    // FROM SUPPORT COMMENT
 // what exactly is gfs? it has all the objects in the "files" document in our database
 
-
 // CREATE STORAGE ENGINE (OR OBJECT. Pasted from multer-grid-fs github docs). 
 // Here is where we use "crypto" for file encryption:
 const storage = new GridFsStorage({
@@ -78,13 +77,9 @@ app.post('/upload', upload.single('file'), (req, res) => {
   //res.redirect('/') // Take us back to the homepage after uploading an image. 
 })
 
-// we want to make an api where we can say "localhost/uploads/files", or along those lines...
-// WE NEED TO USE GridFSBucket HERE TOO.
 // @route GET /files
 // @desc Display all files in JSON.
 app.get('/files', (req, res) => {
-  // To find files you will have to use gfs.find() as "GridFSBucket" does not support a .findOne() type 
-  // of query. But his works fine, you can just use a toArray() on the find() -SUPPORT COMMENT
   gfs.find().toArray((err, files) => {
     if (!files || files.length === 0) {     // im sure both parts of this cond are the same?
       return res.status(404).json({
@@ -95,20 +90,22 @@ app.get('/files', (req, res) => {
   })
 })
 
-// BRAD'S
-// app.get('/files', (req, res) => {
-//   gfs.find().toArray((err, files) => {
-//     // Check if files
-//     if (!files || files.length === 0) {
-//       return res.status(404).json({
-//         err: 'No files exist'
-//       });
-//     }
-//     return res.json(files);
-//   });
-// });
-
-
+// @route GET /files/:filename
+// @desc Display all files in JSON. NEEDS TO GET PASSED THE (ENCRYPTED) FILENAME. 
+// EG: localhost:5000/files/4039d3b7bc570a59b94bcb344c7ced52.jpg
+app.get('/files/:filename', (req, res) => {
+  // To find files you will have to use gfs.find() as "GridFSBucket" does not support a .findOne() type 
+  // of query. But his works fine, you can just use a toArray() on the find() -SUPPORT COMMENT
+  gfs.find({filename: req.params.filename}).toArray((err, file) => {
+    if (!file || file.length === 0) {     // im sure both parts of this cond are the same?
+      return res.status(404).json({
+        err: 'no FILE exists'
+      });
+    }
+    // file exists:
+    return res.json(file);
+  })
+})
 
 // SECOND ARG (optional), upload.single('file'), is our middleware. We use "single" b/c we are uploading a 
 // single file. We pass to single() the name we used for the "file" field needs to be the same as our html 
