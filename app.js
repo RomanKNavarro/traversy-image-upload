@@ -29,27 +29,13 @@ const mongoURI = "mongodb+srv://ronnoverro:streets123@imagecluster.uwvcxj6.mongo
 const conn = mongoose.createConnection(mongoURI); // mongo connection
 // I AM SUPPOSED TO CONNECT TO THE DATABASE, NOT THE CLUSTER
 
-// init gfs (initialize grid fs variable). 
-
-
-// THIS IS DEPRECATED. 
-// init gfs (initialize grid fs variable). 
-// let gfs
-// conn.once('open', () => {
-//   // Init stream
-//   gfs = Grid(conn.db, mongoose.mongo);
-//   gfs.collection('uploads');
-// });
-// what does deprecated code do? we specify what we want to use as our collection name, "uploads", when our db is open.
-// NEED TO REPLACE ALL INSTANCES OF "gridfs-stream" with mongoose's GridFSBucket
-
 // This is to set the collection name. ERROR HERE:
 let gfs;
 conn.once('open', () => {
-  gfs = new mongoose.mongo.GridFSBucket(conn.db, {bucketName: 'files'});
+  gfs = new mongoose.mongo.GridFSBucket(conn.db, {bucketName: 'uploads'});
 })
 // let gfs = new mongoose.mongo.GridFSBucket(conn.db, {bucketName: 'files'});    // FROM SUPPORT COMMENT
-
+// what exactly is gfs? it has all the objects in the "files" document in our database
 
 
 // CREATE STORAGE ENGINE (OR OBJECT. Pasted from multer-grid-fs github docs). 
@@ -91,6 +77,39 @@ app.post('/upload', upload.single('file'), (req, res) => {
   res.json({ file: req.file });
   //res.redirect('/') // Take us back to the homepage after uploading an image. 
 })
+
+// we want to make an api where we can say "localhost/uploads/files", or along those lines...
+// WE NEED TO USE GridFSBucket HERE TOO.
+// @route GET /files
+// @desc Display all files in JSON.
+app.get('/files', (req, res) => {
+  // To find files you will have to use gfs.find() as "GridFSBucket" does not support a .findOne() type 
+  // of query. But his works fine, you can just use a toArray() on the find() -SUPPORT COMMENT
+  gfs.find().toArray((err, files) => {
+    if (!files || files.length === 0) {     // im sure both parts of this cond are the same?
+      return res.status(404).json({
+        err: 'no files exist'
+      });
+    }
+    return res.json(files); 
+  })
+})
+
+// BRAD'S
+// app.get('/files', (req, res) => {
+//   gfs.find().toArray((err, files) => {
+//     // Check if files
+//     if (!files || files.length === 0) {
+//       return res.status(404).json({
+//         err: 'No files exist'
+//       });
+//     }
+//     return res.json(files);
+//   });
+// });
+
+
+
 // SECOND ARG (optional), upload.single('file'), is our middleware. We use "single" b/c we are uploading a 
 // single file. We pass to single() the name we used for the "file" field needs to be the same as our html 
 // "input" element's "name" property. 
