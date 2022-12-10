@@ -67,7 +67,21 @@ const upload = multer({ storage });
 // @route GET /
 // @desc Loads form 
 app.get('/', (req, res) => {
-  res.render('index');          // THIS IS NEEDED TO RENDER OUR PAGE YOU IDIOT.
+  // res.render('index');          // THIS IS NEEDED TO RENDER OUR PAGE YOU IDIOT.
+  gfs.find().toArray((err, files) => {
+    if (!files || files.length === 0) {     // im sure both parts of this cond are the same?
+      res.render('index', {files: false});  // if no files, return empty page. Why is the object arg. needed?
+    } else {
+      files.map(file => {
+        if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
+          file.isImage = true;    // we create a new isImage property and set it to true. 
+        } else {
+          files.isImage = false;
+        }
+      });
+      res.render('index', {files: files}); // this will render WITH the files
+    } 
+  })
 });   
 
 // @route POST /upload
@@ -91,7 +105,7 @@ app.get('/files', (req, res) => {
 })
 
 // @route GET /files/:filename
-// @desc Display a single file in JSON. NEEDS TO GET PASSED THE (ENCRYPTED) FILENAME. 
+// @desc Display a single file (NOT IMAGE ITSELF) in JSON. NEEDS TO GET PASSED THE (ENCRYPTED) FILENAME. 
 // EG: localhost:5000/files/4039d3b7bc570a59b94bcb344c7ced52.jpg
 app.get('/files/:filename', (req, res) => {
   // To find files you will have to use gfs.find() as "GridFSBucket" does not support a .findOne() type 
@@ -108,51 +122,30 @@ app.get('/files/:filename', (req, res) => {
 })
 
 // @route GET /image/:filename
-// @desc Display image 
-// EG: localhost:5000/image/4039d3b7bc570a59b94bcb344c7ced52.jpg
+// @desc Display Image
+// CONTENTTYPE: "image/jpeg" and "image/png" (directly copied over)
+
 app.get('/image/:filename', (req, res) => {
   gfs.find({filename: req.params.filename}).toArray((err, file) => {
-    if (!file || file.length === 0) {     // im sure both parts of this cond are the same?
+    // Check if file
+    if (!file || file.length === 0) {
       return res.status(404).json({
-        err: 'no FILE exists'
+        err: 'No file exists'
       });
     }
-    
-    // check if image:
-    //  I SPELLED "contentType" correct. yes.
-    // image objects have a property that looks like: contentType:	"image/jpeg"
+
+    // Check if image
     if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
-      // read output to browser:
-      // const readstream = gfs.createReadStream(file.filename); HERE'S WHAT ACTUALLY DISPLAYS THE IMAGE vvv
-      const readstream = GridFSBucket.openDownloadStreamByName(file.filename);  // FROM SUPPORT COMMENT
+      // Read output to browser
+      const readstream = gfs.createReadStream(file.filename);
       readstream.pipe(res);
     } else {
       res.status(404).json({
-        err: `not an image. ${file.contentType} file passed`
-        // I get this: "not an image. undefined file passed"
-      })
+        err: 'Not an image'
+      });
     }
-  })
-})
-
-// BRAD'S
-// // @route GET /image/:filename
-// // @desc Display Image
-// app.get('/image/:filename', (req, res) => {
-// OTHER STUFF COMMENTED OUT
-
-//     // Check if image
-//     if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
-//       // Read output to browser
-//       const readstream = gfs.createReadStream(file.filename);
-//       readstream.pipe(res);
-//     } else {
-//       res.status(404).json({
-//         err: 'Not an image'
-//       });
-//     }
-//   });
-// });
+  });
+});
 
 // SECOND ARG (optional), upload.single('file'), is our middleware. We use "single" b/c we are uploading a 
 // single file. We pass to single() the name we used for the "file" field needs to be the same as our html 
