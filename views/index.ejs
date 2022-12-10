@@ -54,14 +54,14 @@
               <% if (file.isImage) { %>
                 <!-- the filename is dynamic so we use ejs for it too. -->
                 <img src="image/<%= file.filename %>" alt="">
-              %> } else { %>
+              <% } else { %>
                 <!-- if not an image, just show the filename -->
                 <%= file.filename %>
               <% } %>
 
-              <!-- ADD A DELETE BUTTON. clicking it creats a DELETE (not post) request -->
+              <!-- ADD A DELETE BUTTON (with bootstrap). clicking it creates a DELETE (not post) request -->
               <form method="POST" action="/files/<%= file._id %>?_method=DELETE">
-                <button class="btn btn-danger btn-block mt4"></button>
+                <button class="btn btn-danger btn-block mt-4">Delete</button>
               </form>
             </div>
           <% }) %>  

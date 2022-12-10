@@ -62,9 +62,10 @@ const upload = multer({ storage });
 // we can now use this 'upload' var as our middleware for our post route. 
 
 // CREATING OUR ROUTES: '/' is our index route. Specifically, it will look through views/index.ejs
+//  ALL THESE ROUTES ARE WHAT HANDLE OUR REQUESTS
 
 // @route GET /
-// @desc Loads form 
+// @desc Loads form page
 app.get('/', (req, res) => {
   // res.render('index');          // THIS IS NEEDED TO RENDER OUR PAGE YOU IDIOT.
   gfs.find().toArray((err, files) => {
@@ -106,6 +107,9 @@ app.get('/files', (req, res) => {
 // @route GET /files/:filename
 // @desc Display a single file (NOT IMAGE ITSELF) in JSON. NEEDS TO GET PASSED THE (ENCRYPTED) FILENAME. 
 // EG: localhost:5000/files/4039d3b7bc570a59b94bcb344c7ced52.jpg
+
+/* I FIGURED OUT THIS REQ.PARAMS THING: refers to the file object found using the ":filename" requirement 
+provided by the user (the arg itself in our endpoint, not the actual "filename" property. */
 app.get('/files/:filename', (req, res) => {
   // To find files you will have to use gfs.find() as "GridFSBucket" does not support a .findOne() type 
   // of query. But his works fine, you can just use a toArray() on the find() -SUPPORT COMMENT
@@ -149,10 +153,25 @@ app.get('/image/:filename', (req, res) => {
     }
   });
 });
-
 // SECOND ARG (optional), upload.single('file'), is our middleware. We use "single" b/c we are uploading a 
 // single file. We pass to single() the name we used for the "file" field needs to be the same as our html 
 // "input" element's "name" property. 
+
+// @route DELETE /files/:id
+// @desc Delete file
+app.delete('/files/:id', (req, res) => {
+  /* v What's this? we call the (normal js) func. remove() on gfs (our database) to remove the object with 
+  matching id property. We also need to include the collection via the "root" property. Why do we pass
+  "gridStore" if we're not even using it? */ 
+  gfs.remove({_id: req.params.id, root: 'uploads'}, (err, gridStore) => {
+    if (err) {
+      return res.status(404).json({ err: err });
+    }
+    res.redirect('/');  // what's the point of redirecting if we're already on the main page?
+  });
+
+})
+
 const port = 5000;
 
 app.listen(port, () => console.log(`Server started on port ${port}`))   // LOOK: NOT ALL CALLBACKS ARE ERROR FUNCS
