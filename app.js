@@ -11,7 +11,6 @@ const {GridFsStorage} = require('multer-gridfs-storage');
 // const Grid = require('gridfs-stream');     // DEPRECATED. WHAT DO WE USE INSTEAD?
 const methodOverride = require('method-override')
 
-
 const app = express();
 
 // MIDDLEWARE
@@ -111,7 +110,7 @@ app.get('/files/:filename', (req, res) => {
   // To find files you will have to use gfs.find() as "GridFSBucket" does not support a .findOne() type 
   // of query. But his works fine, you can just use a toArray() on the find() -SUPPORT COMMENT
   gfs.find({filename: req.params.filename}).toArray((err, file) => {
-    if (!file || file.length === 0) {     // im sure both parts of this cond are the same?
+    if (!file || file.length === 0) {     // im sure both parts of this cond are the same?  
       return res.status(404).json({
         err: 'no FILE exists'
       });
@@ -128,11 +127,15 @@ app.get('/files/:filename', (req, res) => {
 app.get('/image/:filename', (req, res) => {
   gfs.find({filename: req.params.filename}).toArray((err, file) => {
     // Check if file
-    if (!file || file.length === 0) {
+    if (!file || file.length === 0) {   // THE LENGTH PROP. CAN BE READ.
       return res.status(404).json({
         err: 'No file exists'
       });
     }
+
+    // return res.status(200).json({
+    //   message: JSON.stringify(file.filename)     // I GET "1", WHEN THE LENGTH PROP. IS 	697592. file['filename']
+    // });    
 
     // Check if image
     if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {

@@ -1,4 +1,5 @@
 <!-- "SKELETON" CREATED WITH "!" CRAZY! -->
+<!-- THIS LOOKS IDENTICAL TO HTML. IT IS, EXCEPT IN THIS HTML WE ARE ABLE TO USE EJS SYNTAX (SEE LINE ) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,9 +9,17 @@
   <!-- CSS CDN FROM BOOTSTRAP: -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" 
   integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  
+  <!-- added a style so our images dont look crazy big.  -->
+  <style>
+    img {
+      width: 100%;    
+    }
+  </style>
 
   <title>Mongo File Uploads</title>
 </head>
+
 <body>
   <!-- created with .container. lol remember this stuff please. -->
   <div class="containter">  
@@ -33,6 +42,32 @@
           <!-- btn block makes it stretch all the way across -->
           <input type="submit" value="Submit" class="btn btn-primary btn-block">
         </form>
+
+        <!-- HR TAG USED TO "DEFINE A CHANGE" (E.G: "CHANGE OF SUBJECT") IN HTML. LOL-->
+        <hr>
+        <!-- I WONDER HOW IT KNOWS WHAT "FILES" IS?? -->
+        <% if (files){ %>   
+          <!-- even callback funcs, like the one used here in forEach, need to use EJS syntax -->
+          <% files.forEach(function(file) {%>
+            <!-- mb3 = margin-bottom 3 -->
+            <div class="card card-body mb-3">
+              <% if (file.isImage) { %>
+                <!-- the filename is dynamic so we use ejs for it too. -->
+                <img src="image/<%= file.filename %>" alt="">
+              %> } else { %>
+                <!-- if not an image, just show the filename -->
+                <%= file.filename %>
+              <% } %>
+
+              <!-- ADD A DELETE BUTTON. clicking it creats a DELETE (not post) request -->
+              <form method="POST" action="/files/<%= file._id %>?_method=DELETE">
+                <button class="btn btn-danger btn-block mt4"></button>
+              </form>
+            </div>
+          <% }) %>  
+        <%} else { %>
+          <p>No files to show</p>
+        <% } %>
       </div>
     </div>
   </div>
