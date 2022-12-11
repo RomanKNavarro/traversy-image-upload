@@ -11,7 +11,6 @@ const {GridFsStorage} = require('multer-gridfs-storage');
 // const Grid = require('gridfs-stream');     // DEPRECATED. WHAT DO WE USE INSTEAD?
 const methodOverride = require('method-override')
 
-
 const app = express();
 
 // MIDDLEWARE
@@ -21,24 +20,16 @@ app.use(methodOverride('_method'));
 when we create our form in order to make a delete request */
 
 app.set('view engine', 'ejs')   
-// using ejs as our view engine. We can totally use react too, but ejs is quick. 
-// Plus this isn't a frontend tutorial 
 
-// MONGO URI (made sure to select "connect from application")
 const mongoURI = "mongodb+srv://ronnoverro:streets123@imagecluster.uwvcxj6.mongodb.net/?retryWrites=true&w=majority"
 const conn = mongoose.createConnection(mongoURI); // mongo connection
-// I AM SUPPOSED TO CONNECT TO THE DATABASE, NOT THE CLUSTER
 
-// This is to set the collection name. ERROR HERE:
 let gfs;
 conn.once('open', () => {
   gfs = new mongoose.mongo.GridFSBucket(conn.db, {bucketName: 'uploads'});
 })
-// let gfs = new mongoose.mongo.GridFSBucket(conn.db, {bucketName: 'files'});    // FROM SUPPORT COMMENT
-// what exactly is gfs? it has all the objects in the "files" document in our database
 
-// CREATE STORAGE ENGINE (OR OBJECT. Pasted from multer-grid-fs github docs). 
-// Here is where we use "crypto" for file encryption:
+// TODO: FIND OUT WHAT EXACTLY GRIDFSSTORAGE DOES AGAIN 
 const storage = new GridFsStorage({
   url: mongoURI,
   file: (req, file) => {
@@ -60,7 +51,6 @@ const storage = new GridFsStorage({
   }
 });
 const upload = multer({ storage });
-// we can now use this 'upload' var as our middleware for our post route. 
 
 // CREATING OUR ROUTES: '/' is our index route. Specifically, it will look through views/index.ejs
 
@@ -94,16 +84,14 @@ app.get('/files', (req, res) => {
 // @desc Display a single file in JSON. NEEDS TO GET PASSED THE (ENCRYPTED) FILENAME. 
 // EG: localhost:5000/files/4039d3b7bc570a59b94bcb344c7ced52.jpg
 app.get('/files/:filename', (req, res) => {
-  // To find files you will have to use gfs.find() as "GridFSBucket" does not support a .findOne() type 
-  // of query. But his works fine, you can just use a toArray() on the find() -SUPPORT COMMENT
   gfs.find({filename: req.params.filename}).toArray((err, file) => {
     if (!file || file.length === 0) {     // im sure both parts of this cond are the same?
       return res.status(404).json({
         err: 'no FILE exists'
       });
-    }
-    // file exists:
-    return res.json(file);
+    }   
+    return res.json(file); 
+    
   })
 })
 
@@ -117,46 +105,22 @@ app.get('/image/:filename', (req, res) => {
         err: 'no FILE exists'
       });
     }
-    
     // check if image:
     //  I SPELLED "contentType" correct. yes.
     // image objects have a property that looks like: contentType:	"image/jpeg"
-    if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
+    if (file[0].contentType === 'image/jpeg' || file[0].contentType === 'image/png') {
       // read output to browser:
-      // const readstream = gfs.createReadStream(file.filename); HERE'S WHAT ACTUALLY DISPLAYS THE IMAGE vvv
-      const readstream = GridFSBucket.openDownloadStreamByName(file.filename);  // FROM SUPPORT COMMENT
+      const readstream = GridFSBucket.openDownloadStreamByName(file.filename);  
       readstream.pipe(res);
     } else {
       res.status(404).json({
-        err: `not an image. ${file.contentType} file passed`
+        err: `not an image. ${file[0].contentType} file passed`
         // I get this: "not an image. undefined file passed"
       })
     }
   })
 })
 
-// BRAD'S
-// // @route GET /image/:filename
-// // @desc Display Image
-// app.get('/image/:filename', (req, res) => {
-// OTHER STUFF COMMENTED OUT
-
-//     // Check if image
-//     if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
-//       // Read output to browser
-//       const readstream = gfs.createReadStream(file.filename);
-//       readstream.pipe(res);
-//     } else {
-//       res.status(404).json({
-//         err: 'Not an image'
-//       });
-//     }
-//   });
-// });
-
-// SECOND ARG (optional), upload.single('file'), is our middleware. We use "single" b/c we are uploading a 
-// single file. We pass to single() the name we used for the "file" field needs to be the same as our html 
-// "input" element's "name" property. 
 const port = 5000;
 
 app.listen(port, () => console.log(`Server started on port ${port}`))   // LOOK: NOT ALL CALLBACKS ARE ERROR FUNCS
