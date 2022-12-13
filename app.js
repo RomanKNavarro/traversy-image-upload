@@ -16,8 +16,8 @@ const app = express();
 // MIDDLEWARE
 app.use(bodyParser.json())
 app.use(methodOverride('_method')); 
-/* this tells our app that we want to use a query string when we create our form in order to make 
-a delete request. Where do we use it? In Index.ejs when we want to override our delete POSTS */
+/* WE USE THIS FOR DELETE REQUESTS. This tells our app that we want to use a query string when we create our form 
+in order to make a delete request. Where do we use it? In Index.ejs when we want to override our delete POSTS */
 
 app.set('view engine', 'ejs')   
 // using ejs as our view engine. We can totally use react too, but ejs is quick. 
@@ -163,14 +163,23 @@ app.delete('/files/:id', (req, res) => {
   /* v What's this? we call the (normal js) func. remove() on gfs (our database) to remove the object with 
   matching id property. We also need to include the collection via the "root" property. Why do we pass
   "gridStore" if we're not even using it? */ 
-  gfs.remove({_id: req.params.id, root: 'uploads'}, (err, gridStore) => {
+  gfs.files.remove({ _id: req.params.id, root: 'uploads' }, (err, gridStore) => {
     if (err) {
       return res.status(404).json({ err: err });
     }
     res.redirect('/');  // what's the point of redirecting if we're already on the main page?
   });
-
 })
+
+// app.delete('/files/:id', (req, res) => {
+//   gfs.remove({ _id: req.params.id, root: 'uploads' }, (err, gridStore) => {
+//     if (err) {
+//       return res.status(404).json({ err: err });
+//     }
+
+//     res.redirect('/');
+//   });
+// });
 
 const port = 5000;
 
