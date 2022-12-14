@@ -159,18 +159,30 @@ app.get('/image/:filename', (req, res) => {
 
 // @route DELETE /files/:id
 // @desc Delete file
-app.delete('/files/:id', (req, res) => {
-  /* v What's this? we call the (normal js) func. remove() on gfs (our database) to remove the object with 
+app.delete('/files/:id', async (req, res) => {
+  /* v What's this? we call the delete func on gfs (our database) to remove the object with 
   matching id property. We also need to include the collection via the "root" property. Why do we pass
   "gridStore" if we're not even using it? */ 
-  gfs.files.remove({ _id: req.params.id, root: 'uploads' }, (err, gridStore) => {
-    if (err) {
-      return res.status(404).json({ err: err });
-    }
-    res.redirect('/');  // what's the point of redirecting if we're already on the main page?
-  });
+  try {
+    const obj_id = new mongoose.Types.ObjectId(req.params.id);
+    gfs.delete(obj_id);
+    res.redirect('/');
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+
+
+  // gfs.delete({ _id: req.params.id, root: 'uploads' }, (err, gridStore) => {
+  //   if (err) {
+  //     //res.redirect('/');
+  //     return res.status(404).json({ err: `couldn't find file w/ id of ${req.params.id}` });
+  //   }
+  //   res.redirect('/');  // what's the point of redirecting if we're already on the main page?
+  // });
 })
 
+// BRAD
 // app.delete('/files/:id', (req, res) => {
 //   gfs.remove({ _id: req.params.id, root: 'uploads' }, (err, gridStore) => {
 //     if (err) {

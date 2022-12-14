@@ -46,19 +46,18 @@
         <!-- HR TAG USED TO "DEFINE A CHANGE" (E.G: "CHANGE OF SUBJECT") IN HTML. LOL-->
         <hr>
         <!-- I WONDER HOW IT KNOWS WHAT "FILES" IS?? -->
-        <% if (files){ %>   
+        <% if(files){ %>   
           <!-- even callback funcs, like the one used here in forEach, need to use EJS syntax -->
-          <% files.forEach(function(file) {%>
+          <% files.forEach(function(file) { %>
             <!-- mb3 = margin-bottom 3 -->
             <div class="card card-body mb-3">
-              <% if (file.isImage) { %>
+              <% if(file.isImage) { %>
                 <!-- the filename is dynamic so we use ejs for it too. -->
                 <img src="image/<%= file.filename %>" alt="">
               <% } else { %>
                 <!-- if not an image, just show the filename -->
                 <%= file.filename %>
               <% } %>
-
               <!-- ADD A DELETE BUTTON (with bootstrap). clicking it creates a DELETE (not post) request -->
               <form method="POST" action="/files/<%= file._id %>?_method=DELETE">
                 <button class="btn btn-danger btn-block mt-4">Delete</button>
@@ -68,6 +67,24 @@
         <%} else { %>
           <p>No files to show</p>
         <% } %>
+
+        <!-- BRAD'S (SAME AS MINE) -->
+        <!-- <% if(files){ %>
+          <% files.forEach(function(file) { %>
+            <div class="card card-body mb-3">
+              <% if(file.isImage) { %>
+                <img src="image/<%= file.filename %>" alt="">
+              <% } else { %>
+                <%= file.filename %>
+              <% } %>
+              <form method="POST" action="/files/<%= file._id %>?_method=DELETE">
+                <button class="btn btn-danger btn-block mt-4">Delete</button>
+              </form>
+            </div>
+          <% }) %>
+        <%} else { %>
+          <p>No files to show</p>
+        <% } %> -->
       </div>
     </div>
   </div>
