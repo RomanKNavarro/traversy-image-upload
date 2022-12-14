@@ -1,12 +1,11 @@
 const express = require('express');
-const bodyParser = require('body-parser');  // core express module. For our middleware
 // CORE NODE.JS MODULES:
-const path = require('path');
+const path = require('path');   // we use this to get the 
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 const multer = require('multer');
 
-// What is this for again?
+// What is this for again? we usse to create our "gfs" variable. 
 const {GridFsStorage} = require('multer-gridfs-storage');
 // const Grid = require('gridfs-stream');     // DEPRECATED. WHAT DO WE USE INSTEAD?
 const methodOverride = require('method-override')
@@ -14,7 +13,6 @@ const methodOverride = require('method-override')
 const app = express();
 
 // MIDDLEWARE
-app.use(bodyParser.json())
 app.use(methodOverride('_method')); 
 /* WE USE THIS FOR DELETE REQUESTS. This tells our app that we want to use a query string when we create our form 
 in order to make a delete request. Where do we use it? In Index.ejs when we want to override our delete POSTS */
@@ -47,7 +45,7 @@ const storage = new GridFsStorage({
         if (err) {
           return reject(err);
         }
-        // if no error, create filename and fileInfo object. buckName should match collection name
+        // if no error, create filename and fileInfo object. bucketName should match collection name
         const filename = buf.toString('hex') + path.extname(file.originalname);
         const fileInfo = {
           filename: filename,
@@ -88,7 +86,8 @@ app.get('/', (req, res) => {
 // @desc Uploads file to DB
 app.post('/upload', upload.single('file'), (req, res) => {
   res.json({ file: req.file });
-  //res.redirect('/') // Take us back to the homepage after uploading an image. 
+  res.redirect('/') 
+  /* ANSWER I HAD ON CALLBACK ANSWERED */
 })
 
 // @route GET /files
@@ -171,15 +170,6 @@ app.delete('/files/:id', async (req, res) => {
     console.error(err.message);
     res.status(500).send("Server Error");
   }
-
-
-  // gfs.delete({ _id: req.params.id, root: 'uploads' }, (err, gridStore) => {
-  //   if (err) {
-  //     //res.redirect('/');
-  //     return res.status(404).json({ err: `couldn't find file w/ id of ${req.params.id}` });
-  //   }
-  //   res.redirect('/');  // what's the point of redirecting if we're already on the main page?
-  // });
 })
 
 // BRAD
