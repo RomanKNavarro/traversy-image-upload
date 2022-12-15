@@ -17,7 +17,7 @@ app.use(methodOverride('_method'));
 /* WE USE THIS FOR DELETE REQUESTS. This tells our app that we want to use a query string when we create our form 
 in order to make a delete request. Where do we use it? In Index.ejs when we want to override our delete POSTS */
 
-app.set('view engine', 'ejs')   
+app.set('view engine', 'ejs')   // I believe in 2022 this is now outdated.   
 // using ejs as our view engine. We can totally use react too, but ejs is quick. 
 // Plus this isn't a frontend tutorial 
 
@@ -35,7 +35,8 @@ conn.once('open', () => {
 // what exactly is gfs? it has all the objects in the "files" document in our database
 
 // CREATE STORAGE ENGINE (OR OBJECT. Pasted from multer-grid-fs github docs). 
-// Here is where we use "crypto" for file encryption:
+// Here is where we use "crypto" for file encryption.
+// THIS STORAGE IS CREATED SOLEY FOR THE PURPOSE OF UPLOADING FILES LOL. yes, correct.
 const storage = new GridFsStorage({
   url: mongoURI,
   file: (req, file) => {
@@ -57,9 +58,9 @@ const storage = new GridFsStorage({
   }
 });
 const upload = multer({ storage });
-// we can now use this 'upload' var as our middleware for our post route. 
+// we can now use this 'upload' var as our middleware for our post route. Only time "storage" is used. 
 
-// CREATING OUR ROUTES: '/' is our index route. Specifically, it will look through views/index.ejs
+// CREATING OUR ROUTES: '/' is our index route. Specifically, it will look through (or display) views/index.ejs
 //  ALL THESE ROUTES ARE WHAT HANDLE OUR REQUESTS
 
 // @route GET /
