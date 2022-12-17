@@ -15,33 +15,44 @@ const conn = mongoose.createConnection(mongoURI);
 
 let gfs;
 conn.once('open', () => {
-  gfs = new mongoose.mongo.GridFSBucket(conn.db, {bucketName: 'uploads'});
+  gfs = new mongoose.mongo.GridFSBucket(conn.db, {bucketName: 'uploads'});  // HERE IS WHERE THE BUCKETNAME IS SET
 })
 
+// Create a storage object with a given configuration (DOCS)
 const storage = new GridFsStorage({
   url: mongoURI,
+  // what is this file property?  it takes the given "file" and encrypts it. 
   file: (req, file) => {
     return new Promise((resolve, reject) => {
       
+      //  SIGNATURE: crypto.randomBytes( size, callback )
       crypto.randomBytes(16, (err, buf) => {
         if (err) {
-          return reject(err);
-        }
-        
+          return reject(err);     
+        }      
+        /* if there's no error, go on to creating the file, using crypto.randomBytes to actually 
+        create the filename (HOPE THAT MAKES SENSE) */
         const filename = buf.toString('hex') + path.extname(file.originalname);
         const fileInfo = {
           filename: filename,
           bucketName: 'uploads'
+          /* I'm guessing this is part of the "uploads." part of the collection names: NOPE. It puts the newly created 
+          file in the "uploads" bucket. 
+          Can I add ANY property name? NOPE. There's a set amount of properties that can be added. I can't just create 
+          my own. List of properties in the docs. 
+          I UNDERSTAND: there's many properties, and all those we didn't included here are used with their default 
+          values. */ 
         };
         resolve(fileInfo);    
       });
     });
   }
 });
+// Set multer storage engine to the newly created object
 const upload = multer({ storage });
 
 app.get('/', (req, res) => {
-  
+  // FIRST INSTANCE OF "FILES" USED IN AN ARROW FUNC. 
   gfs.find().toArray((err, files) => {
     if (!files || files.length === 0) {     
       res.render('index', {files: false});  
@@ -50,10 +61,10 @@ app.get('/', (req, res) => {
         if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
           file.isImage = true;    
         } else {
-          files.isImage = false;
+          file.isImage = false;
         }
       });
-      res.render('index', {files: files}); 
+      res.render('index', {files: files});  // YO? how can this refer to index.ejs if that's in the views folder?
     } 
   })
 });   
