@@ -60,7 +60,7 @@ app.get('/', (req, res) => {
 
   // I think this is supposed to be "gfs.files", but works for me nonetheless lol.
   // TOARRAY() IS SPECIFICALLY FOR CONVERTING COLLECTIONS TO ARRAYS WOOAHH
-  // files refers to "uploads.files".
+  // files refers to "uploads.files". gfs.find() simply returns ALL the files. 
   gfs.find().toArray((err, files) => {
     if (!files || files.length === 0) {     
       res.render('index', {files: false});  
@@ -78,10 +78,10 @@ app.get('/', (req, res) => {
 });   
 
 app.post('/upload', upload.single('file'), (req, res) => {
-  //res.json({ file: req.file });
-  res.redirect('/');
+  res.json({ file: req.file }); 
+  // if we were to leave this ^^^ in, it'd redirect us to http://localhost:5000/upload, showing us the json for the file
+  //res.redirect('/');
 })
-
 
 app.get('/files', (req, res) => {
   gfs.find().toArray((err, files) => {
@@ -90,20 +90,18 @@ app.get('/files', (req, res) => {
         err: 'no files exist'
       });
     }
-    return res.json(files); 
+    return res.json(files);   // this simply returns the files' json objects
   })
 })
 
 app.get('/files/:filename', (req, res) => {
-  
-  
   gfs.find({filename: req.params.filename}).toArray((err, file) => {
     if (!file || file.length === 0) {     
       return res.status(404).json({
         err: 'no FILE exists'
       });
     }
-    return res.json(file);
+    return res.json(file);    // straightforward
   })
 })
 
@@ -115,8 +113,6 @@ app.get('/image/:filename', (req, res) => {
       });
     }
     if (file[0].contentType === 'image/jpeg' || file[0].contentType === 'image/png') {
-      
-      
       const readstream = gfs.openDownloadStreamByName(file[0].filename);    
       readstream.pipe(res);
     } else {

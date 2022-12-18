@@ -1,0 +1,76 @@
+<!-- "SKELETON" CREATED WITH "!" CRAZY! -->
+<!-- THIS LOOKS IDENTICAL TO HTML. IT IS, EXCEPT IN THIS HTML WE ARE ABLE TO USE EJS SYNTAX (SEE LINE ) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- CSS CDN FROM BOOTSTRAP: -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" 
+  integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <!-- added this style vv so our images dont look crazy big.  -->
+  <style>
+    img {
+      width: 100%;    
+    }
+  </style>
+
+  <title>Mongo File Uploads</title>
+</head>
+
+<body>
+  <!-- created with .container. lol remember this stuff please. -->
+  <div class="containter">  
+    <div class="row">
+      <!-- this is a 6-column div. m-auto is to push it to the middle -->
+      <div class="col-md-6 m-auto">
+        <h1 class="text-center display-4 my-4">Mongo File Uploads</h1>
+        <!-- WITH THIS BOOTSTRAP STUFF, EVEN THIS SIMPLE TITLE LOOKS GOOD -->
+
+        <!-- THIS FORM CREATES A POST REQUEST WOOAAH. If you're using a file field like here, then you need 
+        an "enctype" with the value given here v. We have access to our routes. Clicking the upload button 
+        encites the /upload route. -->
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+
+            <!-- more bootstrap. This is the cool "choose file" box -->
+          <div class="custom-file mb-3">
+            <input type="file" name="file" id="file" class="custom-file-input">
+            <label for="file" class="custom-file-label">Choose File</label>
+          </div>
+
+          <!-- btn block makes it stretch all the way across -->
+          <input type="submit" value="Submit" class="btn btn-primary btn-block">
+        </form>
+
+        <!-- HR TAG USED TO "DEFINE A CHANGE" (E.G: "CHANGE OF SUBJECT") IN HTML. LOL-->
+        <hr>
+        <!-- TOOK OUT THE EJS. TODO: REPLACE IT WITH HTML. -->
+        <template id="target">
+          <% for (let name of names) { %>
+            <div><%= name%></div>
+          <% } %>
+        </template>
+      </div>
+    </div>
+  </div>
+  
+  <!-- JS "SCRIPT TAGS" FROM BOOTSTRAP -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+</html>
+
+
+<!-- <template id="target">
+  <% for (let name of names) { %>
+    <div><%= name%></div>
+  <% } %>
+</template> -->
+<!-- ADDED AS PART OF RUNNING EJS IN BROWSER:
+https://gist.github.com/CColeson/bcdb3fea343962aab21e8a92111b5d24 -->
+
+<!-- THIS LOOKS MUUUCH EASIER TO FOLLOW: 
+https://gist.github.com/CColeson/342769d3aa2c55ca3b18774aa12dbf39 -->
