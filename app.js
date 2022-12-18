@@ -16,7 +16,9 @@ const conn = mongoose.createConnection(mongoURI);
 let gfs;
 conn.once('open', () => {
   gfs = new mongoose.mongo.GridFSBucket(conn.db, {bucketName: 'uploads'});  // HERE IS WHERE THE BUCKETNAME IS SET
-})
+});
+// if our storage is defined below vvv, then what is "gfs"? 
+//gfs is our bucket, composed of 2 collections, chunks and files. 
 
 // Create a storage object with a given configuration (DOCS)
 const storage = new GridFsStorage({
@@ -48,11 +50,17 @@ const storage = new GridFsStorage({
     });
   }
 });
+
 // Set multer storage engine to the newly created object
 const upload = multer({ storage });
 
 app.get('/', (req, res) => {
-  // FIRST INSTANCE OF "FILES" USED IN AN ARROW FUNC. 
+  // FIRST INSTANCE OF "FILES" USED IN AN ARROW FUNC. ---RESOLVED
+  // what does '/' refer to again? localhost:5000/ (our main and only page)
+
+  // I think this is supposed to be "gfs.files", but works for me nonetheless lol.
+  // TOARRAY() IS SPECIFICALLY FOR CONVERTING COLLECTIONS TO ARRAYS WOOAHH
+  // files refers to "uploads.files".
   gfs.find().toArray((err, files) => {
     if (!files || files.length === 0) {     
       res.render('index', {files: false});  
@@ -61,7 +69,7 @@ app.get('/', (req, res) => {
         if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
           file.isImage = true;    
         } else {
-          file.isImage = false;
+          file.isImage = false;   // we are simply setting variables here, not doing any actual displaying.
         }
       });
       res.render('index', {files: files});  // YO? how can this refer to index.ejs if that's in the views folder?
@@ -71,7 +79,7 @@ app.get('/', (req, res) => {
 
 app.post('/upload', upload.single('file'), (req, res) => {
   //res.json({ file: req.file });
-  res.redirect('/') 
+  res.redirect('/');
 })
 
 
