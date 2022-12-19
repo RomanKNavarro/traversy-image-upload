@@ -96,9 +96,9 @@ app.get('/', (req, res) => {
 });   
 
 app.post('/upload', upload.single('file'), (req, res) => {
-  res.json({ file: req.file }); 
+  // res.json({ file: req.file }); 
   // if we were to leave this ^^^ in, it'd redirect us to http://localhost:5000/upload, showing us the json for the file
-  //res.redirect('/');
+  res.redirect('/');
 })
 
 app.get('/files', (req, res) => {
