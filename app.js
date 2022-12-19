@@ -8,7 +8,7 @@ const methodOverride = require('method-override')
 const app = express();
 
 app.use(methodOverride('_method')); 
-app.set('view engine', 'ejs')   // can't uncomment since I'm using ejs in index.ejs.
+//app.set('view engine', 'ejs')   // can't uncomment since I'm using ejs in index.ejs.
 
 const mongoURI = "mongodb+srv://ronnoverro:streets123@imagecluster.uwvcxj6.mongodb.net/?retryWrites=true&w=majority";
 const conn = mongoose.createConnection(mongoURI); 
