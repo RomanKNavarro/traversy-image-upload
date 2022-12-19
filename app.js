@@ -8,7 +8,7 @@ const methodOverride = require('method-override')
 const app = express();
 
 app.use(methodOverride('_method')); 
-//app.set('view engine', 'ejs')   // can't uncomment since I'm using ejs in index.ejs.
+app.set('view engine', 'ejs')   // can't uncomment since I'm using ejs in index.ejs.
 
 const mongoURI = "mongodb+srv://ronnoverro:streets123@imagecluster.uwvcxj6.mongodb.net/?retryWrites=true&w=majority";
 const conn = mongoose.createConnection(mongoURI); 
@@ -63,12 +63,12 @@ app.get('/', (req, res) => {
   // files refers to "uploads.files". gfs.find() simply returns ALL the files. 
   gfs.find().toArray((err, files) => {
     if (!files || files.length === 0) {     
-      //res.render('index', {files: false});  
-      const templateHTML = document.getElementById("filess")
-            .innerHTML
-            .replace(/\&lt;/g, "<")
-            .replace(/\&gt;/g, ">");
-      document.getElementById("target").innerHTML = ejs.render(templateHTML, {files: false});
+      res.render('index', {files: false});  
+      // const templateHTML = document.getElementById("filess")
+      //       .innerHTML
+      //       .replace(/\&lt;/g, "<")
+      //       .replace(/\&gt;/g, ">");
+      // document.getElementById("target").innerHTML = ejs.render(templateHTML, {files: false});
 
 
     } else {
@@ -79,12 +79,12 @@ app.get('/', (req, res) => {
           file.isImage = false;   // we are simply setting variables here, not doing any actual displaying.
         }
       });
-      //res.render('index', {files: files});  
-      const templateHTML = document.getElementById("filess")
-            .innerHTML
-            .replace(/\&lt;/g, "<")
-            .replace(/\&gt;/g, ">");
-      document.getElementById("target").innerHTML = ejs.render(templateHTML, {files: files});
+      res.render('index', {files: files});  
+      // const templateHTML = document.getElementById("filess")
+      //       .innerHTML
+      //       .replace(/\&lt;/g, "<")
+      //       .replace(/\&gt;/g, ">");
+      // document.getElementById("target").innerHTML = ejs.render(templateHTML, {files: files});
 
 
 
