@@ -63,7 +63,14 @@ app.get('/', (req, res) => {
   // files refers to "uploads.files". gfs.find() simply returns ALL the files. 
   gfs.find().toArray((err, files) => {
     if (!files || files.length === 0) {     
-      res.render('index', {files: false});  
+      //res.render('index', {files: false});  
+      const templateHTML = document.getElementById("filess")
+            .innerHTML
+            .replace(/\&lt;/g, "<")
+            .replace(/\&gt;/g, ">");
+      document.getElementById("target").innerHTML = ejs.render(templateHTML, {files: false});
+
+
     } else {
       files.map(file => {
         if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
@@ -72,7 +79,18 @@ app.get('/', (req, res) => {
           file.isImage = false;   // we are simply setting variables here, not doing any actual displaying.
         }
       });
-      res.render('index', {files: files});  // YO? how can this refer to index.ejs if that's in the views folder?
+      //res.render('index', {files: files});  
+      const templateHTML = document.getElementById("filess")
+            .innerHTML
+            .replace(/\&lt;/g, "<")
+            .replace(/\&gt;/g, ">");
+      document.getElementById("target").innerHTML = ejs.render(templateHTML, {files: files});
+
+
+
+      /* YO? how can this refer to index.ejs if that's in the views folder?
+        From my understanding after reading online, "res.render" knows to look 
+        in a folder specifically called "views". Nice ---RESOLVED FURTHER IN NOTES */ 
     } 
   })
 });   
