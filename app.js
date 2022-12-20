@@ -8,9 +8,11 @@ const methodOverride = require('method-override')
 const app = express();
 
 app.use(methodOverride('_method')); 
-app.set('view engine', 'ejs')   // can't uncomment since I'm using ejs in index.ejs.
+app.set('view engine', 'ejs');   // can't uncomment since I'm using ejs in index.ejs.
 
-const mongoURI = "mongodb+srv://ronnoverro:streets123@imagecluster.uwvcxj6.mongodb.net/?retryWrites=true&w=majority";
+// const mongoURI = "mongodb+srv://ronnoverro:streets123@imagecluster.uwvcxj6.mongodb.net/?retryWrites=true&w=majority";
+const mongoURI = process.env.MONGO_URI // did I put it right?
+
 const conn = mongoose.createConnection(mongoURI); 
 
 let gfs;
@@ -152,6 +154,7 @@ app.delete('/files/:id', async (req, res) => {
   }
 })
 
-const port = 5000;
+//const port = 5000;
+const port = process.env.PORT || 5000; 
 
 app.listen(port, () => console.log(`Server started on port ${port}`))   
