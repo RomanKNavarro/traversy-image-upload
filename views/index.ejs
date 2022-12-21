@@ -57,7 +57,7 @@
               <% } else { %>
                 <!-- if not an image, just show the filename -->
                 <%= file.filename %>
-              <% } %> -->
+              <% } %> 
               <!-- ADD A DELETE BUTTON (with bootstrap). clicking it creates a DELETE (not post) request -->
               <form method="POST" action="/files/<%= file._id %>?_method=DELETE">
                 <button class="btn btn-danger btn-block mt-4">Delete</button>
